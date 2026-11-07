@@ -13,7 +13,7 @@
 *        set                 : A class that represents a Set
 *        set::iterator       : An iterator through Set
 * Author
-*    <Your name here>
+*    William Barr and Connor Hobbs
 ************************************************************************/
 
 #pragma once
@@ -106,21 +106,22 @@ public:
    //
    // Access
    //
-   iterator find(const T& t) 
-   { 
-      return iterator(); 
+   iterator find(const T& t)
+   {
+      return iterator(bst.find(t));
    }
 
    //
    // Status
    //
-   bool   empty() const noexcept 
-   { 
-      return true;    
+   bool empty() const noexcept
+   {
+      return size() == 0;
    }
-   size_t size() const noexcept 
-   { 
-      return 99;     
+
+   size_t size() const noexcept
+   {
+      return bst.size();
    }
 
    //
@@ -128,44 +129,77 @@ public:
    //
    std::pair<iterator, bool> insert(const T& t)
    {
-      std::pair<iterator, bool> p(iterator(), true);
-      return p;
+      auto result = bst.insert(t, true);
+
+      return { iterator(result.first), result.second };
    }
+
    std::pair<iterator, bool> insert(T&& t)
    {
-      std::pair<iterator, bool> p(iterator(), true);
-      return p;
+      auto result = bst.insert(std::move(t), true);
+
+      return { iterator(result.first), result.second };
    }
+
    void insert(const std::initializer_list <T>& il)
    {
+      for (const T& value : il)
+      {
+         insert(value);
+      }
    }
+
    template <class Iterator>
    void insert(Iterator first, Iterator last)
    {
+      while (first != last)
+      {
+         insert(*first);
+         ++first;
+      }
    }
 
 
    //
    // Remove
    //
-   void clear() noexcept 
-   { 
-   }
-   iterator erase(iterator &it)
-   { 
-      return iterator(); 
-   }
-   size_t erase(const T & t) 
+   void clear() noexcept
    {
-      return 99;
+      bst.clear();
    }
-   iterator erase(iterator &itBegin, iterator &itEnd)
+
+   iterator erase(iterator& it)
    {
-      return iterator();
+      auto result = bst.erase(it.it);
+
+      return iterator(result);
+   }
+
+   size_t erase(const T& t)
+   {
+      auto it = bst.find(t);
+
+      if (it != bst.end())
+      {
+         bst.erase(it);
+         return 1;
+      }
+
+      return 0;
+   }
+
+   iterator erase(iterator itBegin, iterator itEnd)
+   {
+      while (itBegin != itEnd)
+      {
+         itBegin = erase(itBegin);
+      }
+
+      return itEnd;
    }
 
 private:
-   
+
    custom::BST <T> bst;
 };
 
